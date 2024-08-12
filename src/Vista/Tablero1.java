@@ -1,0 +1,1827 @@
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package Vista;
+
+import Modelo.Ataques;
+import Modelo.Fichas;
+import Modelo.Jugadores;
+import Modelo.Movimientos;
+import Modelo.Ruta;
+import static Modelo.Ruta.JFRAMEFONDO;
+import static Modelo.Ruta.TABLEROFONDO;
+import Modelo.loginUser;
+import java.awt.AlphaComposite;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.Image;
+import javax.swing.ImageIcon;
+import javax.swing.JPanel;
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.RenderingHints;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import javax.swing.BorderFactory;
+import javax.swing.JButton;
+import javax.swing.Icon;
+import javax.swing.UIManager;
+import javax.swing.border.Border;
+import java.io.*;
+import java.text.DateFormat.Field;
+import java.util.Random;
+import javax.swing.JComponent;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import static javax.swing.JOptionPane.YES_OPTION;
+import javax.swing.JTextArea;
+import javax.swing.Timer;
+
+/**
+ *
+ * @author dennisse
+ */
+public class Tablero1 extends javax.swing.JFrame {
+//101-140
+
+    private Border bordePorDefecto = BorderFactory.createEmptyBorder();
+    private Border bordeResaltado = BorderFactory.createLineBorder(Color.LIGHT_GRAY, 1);
+    private JButton[][] matrizBotones = new JButton[10][10];
+
+    private JButton botonSeleccionado = null;
+    private Icon iconoSeleccionado = null;
+    private int turnoActual = 1; // 1 para Jugador 1, 2 para Jugador 2
+    private boolean esTurnoHeroes = true; // Verifica si es el turno de los heroes
+
+    FondoFramePanel fondoFrame = new FondoFramePanel();
+    private Jugadores jugadores;
+    private String jugador1;
+    private String jugador2;
+    private String bando;
+    private int piezasPerdidasJugador1 = 0;
+    private int piezasPerdidasJugador2 = 0;
+
+    private static final String[] HEROES_RANGO = {
+        Ruta.BlackWidowHero, Ruta.CaptainAmerica, Ruta.DrStrange, Ruta.Elektra, Ruta.EmmaFrost,
+        Ruta.Daredevil, Ruta.Gambit, Ruta.Hulk, Ruta.HumanTorch, Ruta.IceMan, Ruta.InvisibleWoman,
+        Ruta.IronMan, Ruta.NickFury, Ruta.Wolverine, Ruta.Blade, Ruta.SpiderMan, Ruta.Thor,
+        Ruta.ProfessorX, Ruta.Namor, Ruta.SilverSurfer, Ruta.Cyclops, Ruta.GhostRider, Ruta.Punisher,
+        Ruta.Thing, Ruta.SheHulk, Ruta.Beast, Ruta.GiantMan, Ruta.Colossus, Ruta.SpiderGirl, Ruta.Storm,
+        Ruta.Phoenix, Ruta.Nightcrawler, Ruta.MrFantastic
+    };
+
+    private static final String[] VILLANOS_RANGO = {
+        Ruta.Abomination, Ruta.Apocalypse, Ruta.BlackCat, Ruta.BlackWidowVillain, Ruta.Bullseye,
+        Ruta.Carnage, Ruta.Deadpool, Ruta.DrDoom, Ruta.DrOctopus, Ruta.Electro, Ruta.Galactus,
+        Ruta.GreenGoblin, Ruta.Juggernaut, Ruta.Kingpin, Ruta.Leader, Ruta.Lizard, Ruta.Magneto,
+        Ruta.MoleMan, Ruta.MrSinister, Ruta.Mysterio, Ruta.Mystique, Ruta.OmegaRed, Ruta.Onslaught,
+        Ruta.RedSkull, Ruta.Rhino, Ruta.Sabretooth, Ruta.Sandman, Ruta.Sentinel1, Ruta.Sentinel2,
+        Ruta.Thanos, Ruta.Ultron, Ruta.Venom, Ruta.Viper
+    };
+
+    /**
+     * Crea un nuevo Tablero1
+     */
+    public Tablero1(String jugador2, String bando) {
+        String jugador1 = loginUser.obtenerUsuarioLogueado(); // Obtener el usuario logueado
+        this.jugadores = new Jugadores(jugador2);
+
+        this.jugador1 = jugador1;
+        this.jugador2 = jugador2;
+        this.bando = bando;
+
+        // Establecer el bando seleccionado para el usuario logueado
+        loginUser.establecerBandoSeleccionado(bando);
+
+        FondoPanel fondo = new FondoPanel();
+        this.setContentPane(fondoFrame); // Establecer el fondo del JFrame
+        initComponents();
+        // this.setSize(1278, 870);
+        this.setLocationRelativeTo(null);
+        this.setTitle("Castlevania: Lord of Shadow");
+        this.setResizable(false); // Evita que la ventana se pueda redimensionar
+
+        // Añadir el panel con fondo distinto al JFrame
+        this.add(fondo);
+
+        Jugador1.setText("Jugador 1 (Blanco): " + jugador1);
+        Jugador2.setText("Jugador 2 (Negro): " + jugador2);
+
+        Fichas.colocarFichas(matrizBotones);
+        // Reiniciar paneles de fichas vencidas
+        reiniciarPanelesFichasVencidas();
+
+        // Set the starting player to the one with the heroes
+        if (bando.equals("Heroes")) {
+            turnoActual = 1; // Jugador 1 comienza
+        } else {
+            turnoActual = 2; // Jugador 2 comienza
+        }
+
+    }
+
+    /**
+     * This method is called from within the constructor to initialize the form.
+     * WARNING: Do NOT modify this code. The content of this method is always
+     * regenerated by the Form Editor.
+     */
+    @SuppressWarnings("unchecked")
+    // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
+    private void initComponents() {
+
+        jPanel2 = new FondoPanel();
+        jButton1 = new javax.swing.JButton();
+        jButton2 = new javax.swing.JButton();
+        jButton3 = new javax.swing.JButton();
+        jButton4 = new javax.swing.JButton();
+        jButton5 = new javax.swing.JButton();
+        jButton6 = new javax.swing.JButton();
+        jButton7 = new javax.swing.JButton();
+        jButton8 = new javax.swing.JButton();
+        jButton9 = new javax.swing.JButton();
+        jButton10 = new javax.swing.JButton();
+        jButton11 = new javax.swing.JButton();
+        jButton12 = new javax.swing.JButton();
+        jButton13 = new javax.swing.JButton();
+        jButton14 = new javax.swing.JButton();
+        jButton15 = new javax.swing.JButton();
+        jButton16 = new javax.swing.JButton();
+        jButton17 = new javax.swing.JButton();
+        jButton18 = new javax.swing.JButton();
+        jButton19 = new javax.swing.JButton();
+        jButton20 = new javax.swing.JButton();
+        jButton21 = new javax.swing.JButton();
+        jButton22 = new javax.swing.JButton();
+        jButton23 = new javax.swing.JButton();
+        jButton24 = new javax.swing.JButton();
+        jButton25 = new javax.swing.JButton();
+        jButton26 = new javax.swing.JButton();
+        jButton27 = new javax.swing.JButton();
+        jButton28 = new javax.swing.JButton();
+        jButton29 = new javax.swing.JButton();
+        jButton30 = new javax.swing.JButton();
+        jButton31 = new javax.swing.JButton();
+        jButton32 = new javax.swing.JButton();
+        jButton33 = new javax.swing.JButton();
+        jButton34 = new javax.swing.JButton();
+        jButton35 = new javax.swing.JButton();
+        jButton36 = new javax.swing.JButton();
+        jButton37 = new javax.swing.JButton();
+        jButton38 = new javax.swing.JButton();
+        jButton39 = new javax.swing.JButton();
+        jButton40 = new javax.swing.JButton();
+        jButton41 = new javax.swing.JButton();
+        jButton42 = new javax.swing.JButton();
+        jButton43 = new javax.swing.JButton();
+        jButton44 = new javax.swing.JButton();
+        jButton45 = new javax.swing.JButton();
+        jButton46 = new javax.swing.JButton();
+        jButton47 = new javax.swing.JButton();
+        jButton48 = new javax.swing.JButton();
+        jButton49 = new javax.swing.JButton();
+        jButton50 = new javax.swing.JButton();
+        jButton51 = new javax.swing.JButton();
+        jButton52 = new javax.swing.JButton();
+        jButton53 = new javax.swing.JButton();
+        jButton54 = new javax.swing.JButton();
+        jButton55 = new javax.swing.JButton();
+        jButton56 = new javax.swing.JButton();
+        jButton57 = new javax.swing.JButton();
+        jButton58 = new javax.swing.JButton();
+        jButton59 = new javax.swing.JButton();
+        jButton60 = new javax.swing.JButton();
+        jButton61 = new javax.swing.JButton();
+        jButton62 = new javax.swing.JButton();
+        jButton63 = new javax.swing.JButton();
+        jButton64 = new javax.swing.JButton();
+        jButton65 = new javax.swing.JButton();
+        jButton66 = new javax.swing.JButton();
+        jButton67 = new javax.swing.JButton();
+        jButton68 = new javax.swing.JButton();
+        jButton69 = new javax.swing.JButton();
+        jButton70 = new javax.swing.JButton();
+        jButton71 = new javax.swing.JButton();
+        jButton72 = new javax.swing.JButton();
+        jButton73 = new javax.swing.JButton();
+        jButton74 = new javax.swing.JButton();
+        jButton75 = new javax.swing.JButton();
+        jButton76 = new javax.swing.JButton();
+        jButton77 = new javax.swing.JButton();
+        jButton78 = new javax.swing.JButton();
+        jButton79 = new javax.swing.JButton();
+        jButton80 = new javax.swing.JButton();
+        jButton81 = new javax.swing.JButton();
+        jButton82 = new javax.swing.JButton();
+        jButton83 = new javax.swing.JButton();
+        jButton84 = new javax.swing.JButton();
+        jButton85 = new javax.swing.JButton();
+        jButton86 = new javax.swing.JButton();
+        jButton87 = new javax.swing.JButton();
+        jButton88 = new javax.swing.JButton();
+        jButton89 = new javax.swing.JButton();
+        jButton90 = new javax.swing.JButton();
+        jButton91 = new javax.swing.JButton();
+        jButton92 = new javax.swing.JButton();
+        jButton93 = new javax.swing.JButton();
+        jButton94 = new javax.swing.JButton();
+        jButton95 = new javax.swing.JButton();
+        jButton96 = new javax.swing.JButton();
+        jButton97 = new javax.swing.JButton();
+        jButton98 = new javax.swing.JButton();
+        jButton99 = new javax.swing.JButton();
+        jButton100 = new javax.swing.JButton();
+        JButton[] buttons = new JButton[100];
+        buttons[0] = jButton1;
+        buttons[1] = jButton2;
+        buttons[2] = jButton3;
+        buttons[3] = jButton4;
+        buttons[4] = jButton5;
+        buttons[5] = jButton6;
+        buttons[6] = jButton7;
+        buttons[7] = jButton8;
+        buttons[8] = jButton9;
+        buttons[9] = jButton10;
+        buttons[10] = jButton11;
+        buttons[11] = jButton12;
+        buttons[12] = jButton13;
+        buttons[13] = jButton14;
+        buttons[14] = jButton15;
+        buttons[15] = jButton16;
+        buttons[16] = jButton17;
+        buttons[17] = jButton18;
+        buttons[18] = jButton19;
+        buttons[19] = jButton20;
+        buttons[20] = jButton21;
+        buttons[21] = jButton22;
+        buttons[22] = jButton23;
+        buttons[23] = jButton24;
+        buttons[24] = jButton25;
+        buttons[25] = jButton26;
+        buttons[26] = jButton27;
+        buttons[27] = jButton28;
+        buttons[28] = jButton29;
+        buttons[29] = jButton30;
+        buttons[30] = jButton31;
+        buttons[31] = jButton32;
+        buttons[32] = jButton33;
+        buttons[33] = jButton34;
+        buttons[34] = jButton35;
+        buttons[35] = jButton36;
+        buttons[36] = jButton37;
+        buttons[37] = jButton38;
+        buttons[38] = jButton39;
+        buttons[39] = jButton40;
+        buttons[40] = jButton41;
+        buttons[41] = jButton42;
+        buttons[42] = jButton43;
+        buttons[43] = jButton44;
+        buttons[44] = jButton45;
+        buttons[45] = jButton46;
+        buttons[46] = jButton47;
+        buttons[47] = jButton48;
+        buttons[48] = jButton49;
+        buttons[49] = jButton50;
+        buttons[50] = jButton51;
+        buttons[51] = jButton52;
+        buttons[52] = jButton53;
+        buttons[53] = jButton54;
+        buttons[54] = jButton55;
+        buttons[55] = jButton56;
+        buttons[56] = jButton57;
+        buttons[57] = jButton58;
+        buttons[58] = jButton59;
+        buttons[59] = jButton60;
+        buttons[60] = jButton61;
+        buttons[61] = jButton62;
+        buttons[62] = jButton63;
+        buttons[63] = jButton64;
+        buttons[64] = jButton65;
+        buttons[65] = jButton66;
+        buttons[66] = jButton67;
+        buttons[67] = jButton68;
+        buttons[68] = jButton69;
+        buttons[69] = jButton70;
+        buttons[70] = jButton71;
+        buttons[71] = jButton72;
+        buttons[72] = jButton73;
+        buttons[73] = jButton74;
+        buttons[74] = jButton75;
+        buttons[75] = jButton76;
+        buttons[76] = jButton77;
+        buttons[77] = jButton78;
+        buttons[78] = jButton79;
+        buttons[79] = jButton80;
+        buttons[80] = jButton81;
+        buttons[81] = jButton82;
+        buttons[82] = jButton83;
+        buttons[83] = jButton84;
+        buttons[84] = jButton85;
+        buttons[85] = jButton86;
+        buttons[86] = jButton87;
+        buttons[87] = jButton88;
+        buttons[88] = jButton89;
+        buttons[89] = jButton90;
+        buttons[90] = jButton91;
+        buttons[91] = jButton92;
+        buttons[92] = jButton93;
+        buttons[93] = jButton94;
+        buttons[94] = jButton95;
+        buttons[95] = jButton96;
+        buttons[96] = jButton97;
+        buttons[97] = jButton98;
+        buttons[98] = jButton99;
+        buttons[99] = jButton100;
+        RetirarHeroesBtn = new javax.swing.JButton();
+        mapButtonsToGrid(buttons);
+        Jugador1 = new javax.swing.JLabel();
+        Jugador2 = new javax.swing.JLabel();
+        fichaInfoLabel = new javax.swing.JLabel();
+        heroesVencidos = new javax.swing.JPanel();
+        jButton101 = new javax.swing.JButton();
+        jButton102 = new javax.swing.JButton();
+        jButton103 = new javax.swing.JButton();
+        jButton104 = new javax.swing.JButton();
+        jButton105 = new javax.swing.JButton();
+        jButton106 = new javax.swing.JButton();
+        jButton107 = new javax.swing.JButton();
+        jButton108 = new javax.swing.JButton();
+        jButton109 = new javax.swing.JButton();
+        jButton110 = new javax.swing.JButton();
+        jButton111 = new javax.swing.JButton();
+        jButton112 = new javax.swing.JButton();
+        jButton113 = new javax.swing.JButton();
+        jButton114 = new javax.swing.JButton();
+        jButton115 = new javax.swing.JButton();
+        jButton116 = new javax.swing.JButton();
+        jButton117 = new javax.swing.JButton();
+        jButton118 = new javax.swing.JButton();
+        jButton119 = new javax.swing.JButton();
+        jButton120 = new javax.swing.JButton();
+        jButton121 = new javax.swing.JButton();
+        jButton122 = new javax.swing.JButton();
+        jButton123 = new javax.swing.JButton();
+        jButton124 = new javax.swing.JButton();
+        jButton125 = new javax.swing.JButton();
+        jButton126 = new javax.swing.JButton();
+        jButton127 = new javax.swing.JButton();
+        jButton128 = new javax.swing.JButton();
+        jButton129 = new javax.swing.JButton();
+        jButton130 = new javax.swing.JButton();
+        jButton131 = new javax.swing.JButton();
+        jButton132 = new javax.swing.JButton();
+        jButton133 = new javax.swing.JButton();
+        jButton134 = new javax.swing.JButton();
+        jButton135 = new javax.swing.JButton();
+        jButton136 = new javax.swing.JButton();
+        jButton137 = new javax.swing.JButton();
+        jButton138 = new javax.swing.JButton();
+        jButton139 = new javax.swing.JButton();
+        jButton140 = new javax.swing.JButton();
+        villanosVencidos = new javax.swing.JPanel();
+        jButton141 = new javax.swing.JButton();
+        jButton142 = new javax.swing.JButton();
+        jButton143 = new javax.swing.JButton();
+        jButton144 = new javax.swing.JButton();
+        jButton145 = new javax.swing.JButton();
+        jButton146 = new javax.swing.JButton();
+        jButton147 = new javax.swing.JButton();
+        jButton148 = new javax.swing.JButton();
+        jButton149 = new javax.swing.JButton();
+        jButton150 = new javax.swing.JButton();
+        jButton151 = new javax.swing.JButton();
+        jButton152 = new javax.swing.JButton();
+        jButton153 = new javax.swing.JButton();
+        jButton154 = new javax.swing.JButton();
+        jButton155 = new javax.swing.JButton();
+        jButton156 = new javax.swing.JButton();
+        jButton157 = new javax.swing.JButton();
+        jButton158 = new javax.swing.JButton();
+        jButton159 = new javax.swing.JButton();
+        jButton160 = new javax.swing.JButton();
+        jButton161 = new javax.swing.JButton();
+        jButton162 = new javax.swing.JButton();
+        jButton163 = new javax.swing.JButton();
+        jButton164 = new javax.swing.JButton();
+        jButton165 = new javax.swing.JButton();
+        jButton166 = new javax.swing.JButton();
+        jButton167 = new javax.swing.JButton();
+        jButton168 = new javax.swing.JButton();
+        jButton169 = new javax.swing.JButton();
+        jButton170 = new javax.swing.JButton();
+        jButton171 = new javax.swing.JButton();
+        jButton172 = new javax.swing.JButton();
+        jButton173 = new javax.swing.JButton();
+        jButton174 = new javax.swing.JButton();
+        jButton175 = new javax.swing.JButton();
+        jButton176 = new javax.swing.JButton();
+        jButton177 = new javax.swing.JButton();
+        jButton178 = new javax.swing.JButton();
+        jButton179 = new javax.swing.JButton();
+        jButton180 = new javax.swing.JButton();
+        RetirarVillanosBtn = new javax.swing.JButton();
+        jScrollPane1 = new javax.swing.JScrollPane();
+        fichaInfoText = new javax.swing.JTextArea();
+
+        setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setResizable(false);
+
+        jPanel2.setLayout(new java.awt.GridLayout(10, 10));
+
+        jButton1.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(255, 51, 51)));
+        jButton1.setContentAreaFilled(false);
+        jPanel2.add(jButton1);
+
+        jButton2.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(255, 51, 51)));
+        jButton2.setContentAreaFilled(false);
+        jPanel2.add(jButton2);
+
+        jButton3.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(255, 51, 51)));
+        jButton3.setContentAreaFilled(false);
+        jPanel2.add(jButton3);
+
+        jButton4.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(255, 51, 51)));
+        jButton4.setContentAreaFilled(false);
+        jPanel2.add(jButton4);
+
+        jButton5.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(255, 51, 51)));
+        jButton5.setContentAreaFilled(false);
+        jPanel2.add(jButton5);
+
+        jButton6.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(255, 51, 51)));
+        jButton6.setContentAreaFilled(false);
+        jPanel2.add(jButton6);
+
+        jButton7.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(255, 51, 51)));
+        jButton7.setContentAreaFilled(false);
+        jPanel2.add(jButton7);
+
+        jButton8.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(255, 51, 51)));
+        jButton8.setContentAreaFilled(false);
+        jPanel2.add(jButton8);
+
+        jButton9.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(255, 51, 51)));
+        jButton9.setContentAreaFilled(false);
+        jPanel2.add(jButton9);
+
+        jButton10.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(255, 51, 51)));
+        jButton10.setContentAreaFilled(false);
+        jPanel2.add(jButton10);
+
+        jButton11.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(255, 51, 51)));
+        jButton11.setContentAreaFilled(false);
+        jPanel2.add(jButton11);
+
+        jButton12.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(255, 51, 51)));
+        jButton12.setContentAreaFilled(false);
+        jPanel2.add(jButton12);
+
+        jButton13.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(255, 51, 51)));
+        jButton13.setContentAreaFilled(false);
+        jPanel2.add(jButton13);
+
+        jButton14.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(255, 51, 51)));
+        jButton14.setContentAreaFilled(false);
+        jPanel2.add(jButton14);
+
+        jButton15.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(255, 51, 51)));
+        jButton15.setContentAreaFilled(false);
+        jPanel2.add(jButton15);
+
+        jButton16.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(255, 51, 51)));
+        jButton16.setContentAreaFilled(false);
+        jPanel2.add(jButton16);
+
+        jButton17.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(255, 51, 51)));
+        jButton17.setContentAreaFilled(false);
+        jPanel2.add(jButton17);
+
+        jButton18.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(255, 51, 51)));
+        jButton18.setContentAreaFilled(false);
+        jPanel2.add(jButton18);
+
+        jButton19.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(255, 51, 51)));
+        jButton19.setContentAreaFilled(false);
+        jPanel2.add(jButton19);
+
+        jButton20.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(255, 51, 51)));
+        jButton20.setContentAreaFilled(false);
+        jPanel2.add(jButton20);
+
+        jButton21.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(255, 51, 51)));
+        jButton21.setContentAreaFilled(false);
+        jPanel2.add(jButton21);
+
+        jButton22.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(255, 51, 51)));
+        jButton22.setContentAreaFilled(false);
+        jPanel2.add(jButton22);
+
+        jButton23.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(255, 51, 51)));
+        jButton23.setContentAreaFilled(false);
+        jPanel2.add(jButton23);
+
+        jButton24.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(255, 51, 51)));
+        jButton24.setContentAreaFilled(false);
+        jPanel2.add(jButton24);
+
+        jButton25.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(255, 51, 51)));
+        jButton25.setContentAreaFilled(false);
+        jPanel2.add(jButton25);
+
+        jButton26.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(255, 51, 51)));
+        jButton26.setContentAreaFilled(false);
+        jPanel2.add(jButton26);
+
+        jButton27.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(255, 51, 51)));
+        jButton27.setContentAreaFilled(false);
+        jPanel2.add(jButton27);
+
+        jButton28.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(255, 51, 51)));
+        jButton28.setContentAreaFilled(false);
+        jPanel2.add(jButton28);
+
+        jButton29.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(255, 51, 51)));
+        jButton29.setContentAreaFilled(false);
+        jPanel2.add(jButton29);
+
+        jButton30.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(255, 51, 51)));
+        jButton30.setContentAreaFilled(false);
+        jPanel2.add(jButton30);
+
+        jButton31.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(255, 51, 51)));
+        jButton31.setContentAreaFilled(false);
+        jPanel2.add(jButton31);
+
+        jButton32.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(255, 51, 51)));
+        jButton32.setContentAreaFilled(false);
+        jPanel2.add(jButton32);
+
+        jButton33.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(255, 51, 51)));
+        jButton33.setContentAreaFilled(false);
+        jPanel2.add(jButton33);
+
+        jButton34.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(255, 51, 51)));
+        jButton34.setContentAreaFilled(false);
+        jPanel2.add(jButton34);
+
+        jButton35.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(255, 51, 51)));
+        jButton35.setContentAreaFilled(false);
+        jPanel2.add(jButton35);
+
+        jButton36.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(255, 51, 51)));
+        jButton36.setContentAreaFilled(false);
+        jPanel2.add(jButton36);
+
+        jButton37.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(255, 51, 51)));
+        jButton37.setContentAreaFilled(false);
+        jPanel2.add(jButton37);
+
+        jButton38.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(255, 51, 51)));
+        jButton38.setContentAreaFilled(false);
+        jPanel2.add(jButton38);
+
+        jButton39.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(255, 51, 51)));
+        jButton39.setContentAreaFilled(false);
+        jPanel2.add(jButton39);
+
+        jButton40.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(255, 51, 51)));
+        jButton40.setContentAreaFilled(false);
+        jPanel2.add(jButton40);
+
+        jButton41.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(255, 51, 51)));
+        jButton41.setContentAreaFilled(false);
+        jPanel2.add(jButton41);
+
+        jButton42.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(255, 51, 51)));
+        jButton42.setContentAreaFilled(false);
+        jPanel2.add(jButton42);
+
+        jButton43.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(255, 51, 51)));
+        jButton43.setContentAreaFilled(false);
+        jPanel2.add(jButton43);
+
+        jButton44.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(255, 51, 51)));
+        jButton44.setContentAreaFilled(false);
+        jPanel2.add(jButton44);
+
+        jButton45.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(255, 51, 51)));
+        jButton45.setContentAreaFilled(false);
+        jPanel2.add(jButton45);
+
+        jButton46.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(255, 51, 51)));
+        jButton46.setContentAreaFilled(false);
+        jPanel2.add(jButton46);
+
+        jButton47.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(255, 51, 51)));
+        jButton47.setContentAreaFilled(false);
+        jPanel2.add(jButton47);
+
+        jButton48.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(255, 51, 51)));
+        jButton48.setContentAreaFilled(false);
+        jPanel2.add(jButton48);
+
+        jButton49.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(255, 51, 51)));
+        jButton49.setContentAreaFilled(false);
+        jPanel2.add(jButton49);
+
+        jButton50.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(255, 51, 51)));
+        jButton50.setContentAreaFilled(false);
+        jPanel2.add(jButton50);
+
+        jButton51.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(255, 51, 51)));
+        jButton51.setContentAreaFilled(false);
+        jPanel2.add(jButton51);
+
+        jButton52.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(255, 51, 51)));
+        jButton52.setContentAreaFilled(false);
+        jPanel2.add(jButton52);
+
+        jButton53.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(255, 51, 51)));
+        jButton53.setContentAreaFilled(false);
+        jPanel2.add(jButton53);
+
+        jButton54.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(255, 51, 51)));
+        jButton54.setContentAreaFilled(false);
+        jPanel2.add(jButton54);
+
+        jButton55.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(255, 51, 51)));
+        jButton55.setContentAreaFilled(false);
+        jPanel2.add(jButton55);
+
+        jButton56.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(255, 51, 51)));
+        jButton56.setContentAreaFilled(false);
+        jPanel2.add(jButton56);
+
+        jButton57.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(255, 51, 51)));
+        jButton57.setContentAreaFilled(false);
+        jPanel2.add(jButton57);
+
+        jButton58.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(255, 51, 51)));
+        jButton58.setContentAreaFilled(false);
+        jPanel2.add(jButton58);
+
+        jButton59.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(255, 51, 51)));
+        jButton59.setContentAreaFilled(false);
+        jPanel2.add(jButton59);
+
+        jButton60.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(255, 51, 51)));
+        jButton60.setContentAreaFilled(false);
+        jPanel2.add(jButton60);
+
+        jButton61.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(255, 51, 51)));
+        jButton61.setContentAreaFilled(false);
+        jPanel2.add(jButton61);
+
+        jButton62.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(255, 51, 51)));
+        jButton62.setContentAreaFilled(false);
+        jPanel2.add(jButton62);
+
+        jButton63.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(255, 51, 51)));
+        jButton63.setContentAreaFilled(false);
+        jPanel2.add(jButton63);
+
+        jButton64.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(255, 51, 51)));
+        jButton64.setContentAreaFilled(false);
+        jPanel2.add(jButton64);
+
+        jButton65.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(255, 51, 51)));
+        jButton65.setContentAreaFilled(false);
+        jPanel2.add(jButton65);
+
+        jButton66.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(255, 51, 51)));
+        jButton66.setContentAreaFilled(false);
+        jPanel2.add(jButton66);
+
+        jButton67.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(255, 51, 51)));
+        jButton67.setContentAreaFilled(false);
+        jPanel2.add(jButton67);
+
+        jButton68.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(255, 51, 51)));
+        jButton68.setContentAreaFilled(false);
+        jPanel2.add(jButton68);
+
+        jButton69.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(255, 51, 51)));
+        jButton69.setContentAreaFilled(false);
+        jPanel2.add(jButton69);
+
+        jButton70.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(255, 51, 51)));
+        jButton70.setContentAreaFilled(false);
+        jPanel2.add(jButton70);
+
+        jButton71.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(255, 0, 0)));
+        jButton71.setContentAreaFilled(false);
+        jPanel2.add(jButton71);
+
+        jButton72.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(255, 51, 51)));
+        jButton72.setContentAreaFilled(false);
+        jPanel2.add(jButton72);
+
+        jButton73.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(255, 51, 51)));
+        jButton73.setContentAreaFilled(false);
+        jPanel2.add(jButton73);
+
+        jButton74.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(255, 51, 51)));
+        jButton74.setContentAreaFilled(false);
+        jPanel2.add(jButton74);
+
+        jButton75.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(255, 51, 51)));
+        jButton75.setContentAreaFilled(false);
+        jPanel2.add(jButton75);
+
+        jButton76.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(255, 51, 51)));
+        jButton76.setContentAreaFilled(false);
+        jPanel2.add(jButton76);
+
+        jButton77.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(255, 51, 51)));
+        jButton77.setContentAreaFilled(false);
+        jPanel2.add(jButton77);
+
+        jButton78.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(255, 51, 51)));
+        jButton78.setContentAreaFilled(false);
+        jPanel2.add(jButton78);
+
+        jButton79.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(255, 51, 51)));
+        jButton79.setContentAreaFilled(false);
+        jPanel2.add(jButton79);
+
+        jButton80.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(255, 51, 51)));
+        jButton80.setContentAreaFilled(false);
+        jPanel2.add(jButton80);
+
+        jButton81.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(255, 51, 51)));
+        jButton81.setContentAreaFilled(false);
+        jPanel2.add(jButton81);
+
+        jButton82.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(255, 51, 51)));
+        jButton82.setContentAreaFilled(false);
+        jPanel2.add(jButton82);
+
+        jButton83.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(255, 51, 51)));
+        jButton83.setContentAreaFilled(false);
+        jPanel2.add(jButton83);
+
+        jButton84.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(255, 51, 51)));
+        jButton84.setContentAreaFilled(false);
+        jPanel2.add(jButton84);
+
+        jButton85.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(255, 51, 51)));
+        jButton85.setContentAreaFilled(false);
+        jPanel2.add(jButton85);
+
+        jButton86.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(255, 51, 51)));
+        jButton86.setContentAreaFilled(false);
+        jPanel2.add(jButton86);
+
+        jButton87.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(255, 51, 51)));
+        jButton87.setContentAreaFilled(false);
+        jPanel2.add(jButton87);
+
+        jButton88.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(255, 51, 51)));
+        jButton88.setContentAreaFilled(false);
+        jPanel2.add(jButton88);
+
+        jButton89.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(255, 51, 51)));
+        jButton89.setContentAreaFilled(false);
+        jPanel2.add(jButton89);
+
+        jButton90.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(255, 51, 51)));
+        jButton90.setContentAreaFilled(false);
+        jPanel2.add(jButton90);
+
+        jButton91.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(255, 51, 51)));
+        jButton91.setContentAreaFilled(false);
+        jPanel2.add(jButton91);
+
+        jButton92.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(255, 51, 51)));
+        jButton92.setContentAreaFilled(false);
+        jPanel2.add(jButton92);
+
+        jButton93.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(255, 51, 51)));
+        jButton93.setContentAreaFilled(false);
+        jPanel2.add(jButton93);
+
+        jButton94.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(255, 51, 51)));
+        jButton94.setContentAreaFilled(false);
+        jPanel2.add(jButton94);
+
+        jButton95.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(255, 51, 51)));
+        jButton95.setContentAreaFilled(false);
+        jPanel2.add(jButton95);
+
+        jButton96.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(255, 51, 51)));
+        jButton96.setContentAreaFilled(false);
+        jPanel2.add(jButton96);
+
+        jButton97.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(255, 51, 51)));
+        jButton97.setContentAreaFilled(false);
+        jPanel2.add(jButton97);
+
+        jButton98.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(255, 51, 51)));
+        jButton98.setContentAreaFilled(false);
+        jPanel2.add(jButton98);
+
+        jButton99.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(255, 51, 51)));
+        jButton99.setContentAreaFilled(false);
+        jPanel2.add(jButton99);
+
+        jButton100.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(255, 51, 51)));
+        jButton100.setContentAreaFilled(false);
+        jPanel2.add(jButton100);
+
+        for (JButton button : buttons) {
+            button.addActionListener(new java.awt.event.ActionListener() {
+                public void actionPerformed(java.awt.event.ActionEvent evt) {
+                    buttonActionPerformed(evt);
+                }
+            });
+        }
+        RetirarHeroesBtn.setFont(new java.awt.Font("Lucida Fax", 1, 14)); // NOI18N
+        RetirarHeroesBtn.setText("RETIRAR HEROES");
+        RetirarHeroesBtn.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                RetirarHeroesBtnActionPerformed(evt);
+            }
+        });
+
+        Jugador1.setBackground(new java.awt.Color(0, 0, 0));
+        Jugador1.setFont(new java.awt.Font("Lucida Grande", 0, 18)); // NOI18N
+        Jugador1.setForeground(new java.awt.Color(255, 255, 255));
+        Jugador1.setText("Jugador 1");
+        Jugador1.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED));
+        Jugador1.setOpaque(true);
+
+        Jugador2.setBackground(new java.awt.Color(0, 0, 0));
+        Jugador2.setFont(new java.awt.Font("Lucida Grande", 0, 18)); // NOI18N
+        Jugador2.setForeground(new java.awt.Color(255, 255, 255));
+        Jugador2.setText("Jugador 2");
+        Jugador2.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED));
+        Jugador2.setOpaque(true);
+
+        fichaInfoLabel.setFont(new java.awt.Font("Segoe UI", 0, 10)); // NOI18N
+
+        heroesVencidos.setLayout(new java.awt.GridLayout(10, 4));
+        heroesVencidos.add(jButton101);
+        heroesVencidos.add(jButton102);
+        heroesVencidos.add(jButton103);
+        heroesVencidos.add(jButton104);
+        heroesVencidos.add(jButton105);
+        heroesVencidos.add(jButton106);
+        heroesVencidos.add(jButton107);
+        heroesVencidos.add(jButton108);
+        heroesVencidos.add(jButton109);
+        heroesVencidos.add(jButton110);
+        heroesVencidos.add(jButton111);
+        heroesVencidos.add(jButton112);
+        heroesVencidos.add(jButton113);
+        heroesVencidos.add(jButton114);
+        heroesVencidos.add(jButton115);
+        heroesVencidos.add(jButton116);
+        heroesVencidos.add(jButton117);
+        heroesVencidos.add(jButton118);
+        heroesVencidos.add(jButton119);
+        heroesVencidos.add(jButton120);
+        heroesVencidos.add(jButton121);
+        heroesVencidos.add(jButton122);
+        heroesVencidos.add(jButton123);
+        heroesVencidos.add(jButton124);
+        heroesVencidos.add(jButton125);
+        heroesVencidos.add(jButton126);
+        heroesVencidos.add(jButton127);
+        heroesVencidos.add(jButton128);
+        heroesVencidos.add(jButton129);
+        heroesVencidos.add(jButton130);
+        heroesVencidos.add(jButton131);
+        heroesVencidos.add(jButton132);
+        heroesVencidos.add(jButton133);
+        heroesVencidos.add(jButton134);
+        heroesVencidos.add(jButton135);
+        heroesVencidos.add(jButton136);
+        heroesVencidos.add(jButton137);
+        heroesVencidos.add(jButton138);
+        heroesVencidos.add(jButton139);
+        heroesVencidos.add(jButton140);
+
+        villanosVencidos.setLayout(new java.awt.GridLayout(10, 4));
+        villanosVencidos.add(jButton141);
+        villanosVencidos.add(jButton142);
+        villanosVencidos.add(jButton143);
+        villanosVencidos.add(jButton144);
+        villanosVencidos.add(jButton145);
+        villanosVencidos.add(jButton146);
+        villanosVencidos.add(jButton147);
+        villanosVencidos.add(jButton148);
+        villanosVencidos.add(jButton149);
+        villanosVencidos.add(jButton150);
+        villanosVencidos.add(jButton151);
+        villanosVencidos.add(jButton152);
+        villanosVencidos.add(jButton153);
+        villanosVencidos.add(jButton154);
+        villanosVencidos.add(jButton155);
+        villanosVencidos.add(jButton156);
+        villanosVencidos.add(jButton157);
+        villanosVencidos.add(jButton158);
+        villanosVencidos.add(jButton159);
+        villanosVencidos.add(jButton160);
+        villanosVencidos.add(jButton161);
+        villanosVencidos.add(jButton162);
+        villanosVencidos.add(jButton163);
+        villanosVencidos.add(jButton164);
+        villanosVencidos.add(jButton165);
+        villanosVencidos.add(jButton166);
+        villanosVencidos.add(jButton167);
+        villanosVencidos.add(jButton168);
+        villanosVencidos.add(jButton169);
+        villanosVencidos.add(jButton170);
+        villanosVencidos.add(jButton171);
+        villanosVencidos.add(jButton172);
+        villanosVencidos.add(jButton173);
+        villanosVencidos.add(jButton174);
+        villanosVencidos.add(jButton175);
+        villanosVencidos.add(jButton176);
+        villanosVencidos.add(jButton177);
+        villanosVencidos.add(jButton178);
+        villanosVencidos.add(jButton179);
+        villanosVencidos.add(jButton180);
+
+        RetirarVillanosBtn.setFont(new java.awt.Font("Lucida Fax", 1, 14)); // NOI18N
+        RetirarVillanosBtn.setText("RETIRAR VILLANOS");
+        RetirarVillanosBtn.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                RetirarVillanosBtnActionPerformed(evt);
+            }
+        });
+
+        jScrollPane1.setHorizontalScrollBarPolicy(javax.swing.ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+
+        fichaInfoText.setEditable(false);
+        fichaInfoText.setColumns(20);
+        fichaInfoText.setRows(5);
+        fichaInfoText.setOpaque(false);
+        jScrollPane1.setViewportView(fichaInfoText);
+
+        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
+        getContentPane().setLayout(layout);
+        layout.setHorizontalGroup(
+            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(layout.createSequentialGroup()
+                .addGap(14, 14, 14)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(fichaInfoLabel, javax.swing.GroupLayout.DEFAULT_SIZE, 160, Short.MAX_VALUE)
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE))
+                .addGap(40, 40, 40)
+                .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, 810, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(18, 18, 18)
+                .addComponent(heroesVencidos, javax.swing.GroupLayout.PREFERRED_SIZE, 220, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(villanosVencidos, javax.swing.GroupLayout.PREFERRED_SIZE, 220, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(12, Short.MAX_VALUE))
+            .addGroup(layout.createSequentialGroup()
+                .addGap(327, 327, 327)
+                .addComponent(Jugador1)
+                .addGap(134, 134, 134)
+                .addComponent(Jugador2)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(RetirarHeroesBtn)
+                .addGap(53, 53, 53)
+                .addComponent(RetirarVillanosBtn)
+                .addGap(39, 39, 39))
+        );
+        layout.setVerticalGroup(
+            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(layout.createSequentialGroup()
+                .addGap(22, 22, 22)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(Jugador1)
+                    .addComponent(Jugador2)
+                    .addComponent(RetirarHeroesBtn)
+                    .addComponent(RetirarVillanosBtn))
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(layout.createSequentialGroup()
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, 720, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                        .addGroup(layout.createSequentialGroup()
+                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                            .addComponent(villanosVencidos, javax.swing.GroupLayout.PREFERRED_SIZE, 521, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(layout.createSequentialGroup()
+                                .addGap(81, 81, 81)
+                                .addComponent(fichaInfoLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 142, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(74, 74, 74)
+                                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 142, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addGroup(layout.createSequentialGroup()
+                                .addGap(103, 103, 103)
+                                .addComponent(heroesVencidos, javax.swing.GroupLayout.PREFERRED_SIZE, 521, javax.swing.GroupLayout.PREFERRED_SIZE)))))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
+
+        pack();
+    }// </editor-fold>//GEN-END:initComponents
+
+    private void RetirarHeroesBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_RetirarHeroesBtnActionPerformed
+        String bandoSeleccionado = loginUser.obtenerBandoSeleccionado();
+
+        if ((bandoSeleccionado.equals("Heroes") && esTurnoHeroes())
+                || (bandoSeleccionado.equals("Villanos") && (turnoActual == 2))) {
+
+            int confirmacion = JOptionPane.showConfirmDialog(this, "¿Estás seguro que deseas retirarte?", "Confirmación", JOptionPane.YES_NO_OPTION);
+
+            if (confirmacion == YES_OPTION) {
+                manejarRetiro("Heroes");
+            }
+        } else {
+            JOptionPane.showMessageDialog(this, "No puedes retirarte en este momento.");
+        }
+
+        try {
+            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+    }//GEN-LAST:event_RetirarHeroesBtnActionPerformed
+
+    private void RetirarVillanosBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_RetirarVillanosBtnActionPerformed
+        String bandoSeleccionado = loginUser.obtenerBandoSeleccionado();
+
+        if ((bandoSeleccionado.equals("Villanos") && (turnoActual == 1))
+                || (bandoSeleccionado.equals("Heroes") && esTurnoVillanos())) {
+
+            int confirmacion = JOptionPane.showConfirmDialog(this, "¿Estás seguro que deseas retirarte?", "Confirmación", JOptionPane.YES_NO_OPTION);
+
+            if (confirmacion == YES_OPTION) {
+                manejarRetiro("Villanos");
+            }
+        } else {
+            JOptionPane.showMessageDialog(this, "No puedes retirarte en este momento.");
+        }
+
+        try {
+            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+    }//GEN-LAST:event_RetirarVillanosBtnActionPerformed
+
+    private boolean esTurnoHeroes() {
+        return turnoActual == 1;
+    }
+
+    private boolean esTurnoVillanos() {
+        return turnoActual == 2;
+    }
+
+    private void manejarRetiro(String bandoRetirado) {
+        String ganador;
+        String perdedor;
+        String bandoGanador;
+        String bandoPerdedor;
+
+        if (bandoRetirado.equals("Heroes")) {
+            if (loginUser.obtenerBandoSeleccionado().equals("Villanos")) {
+                ganador = jugador1; // Jugador 1 es Villanos
+                perdedor = jugador2; // Jugador 2 es Heroes
+                bandoGanador = "Villanos";
+                bandoPerdedor = "Heroes";
+            } else {
+                ganador = jugador2; // Jugador 2 es Villanos
+                perdedor = jugador1; // Jugador 1 es Heroes
+                bandoGanador = "Villanos";
+                bandoPerdedor = "Heroes";
+            }
+        } else {
+            if (loginUser.obtenerBandoSeleccionado().equals("Heroes")) {
+                ganador = jugador1; // Jugador 1 es Heroes
+                perdedor = jugador2; // Jugador 2 es Villanos
+                bandoGanador = "Heroes";
+                bandoPerdedor = "Villanos";
+            } else {
+                ganador = jugador2; // Jugador 2 es Heroes
+                perdedor = jugador1; // Jugador 1 es Villanos
+                bandoGanador = "Heroes";
+                bandoPerdedor = "Villanos";
+            }
+        }
+
+        String mensaje = String.format("Felicidades %s usando %s ha ganado ya que %s usando %s se ha retirado del juego – %s",
+                ganador, bandoGanador, perdedor, bandoPerdedor, java.time.LocalDate.now().toString());
+        JOptionPane.showMessageDialog(this, mensaje);
+
+        // Añadir 3 puntos al jugador ganador
+        loginUser.sumarPuntosAlJugador(ganador, 3);
+
+        // Registrar la partida jugada para ambos jugadores
+        loginUser.registrarPartidaJugado(ganador, bandoGanador, true, true, mensaje);  // true indica victoria y actualizar global
+        loginUser.registrarPartidaJugado(perdedor, bandoPerdedor, false, false, mensaje); // false indica derrota y no actualizar global
+//
+        try {
+            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+
+        // Reiniciar variables de juego
+        piezasPerdidasJugador1 = 0;
+        piezasPerdidasJugador2 = 0;
+
+        // Regresar al menú principal
+        cerrarJuego();
+
+    }
+
+    /**
+     * @param args the command line arguments
+     */
+    public static void main(String args[]) {
+        /* Set the Nimbus look and feel */
+        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
+        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
+         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
+         */
+        try {
+            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
+                if ("Nimbus".equals(info.getName())) {
+                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
+                    break;
+                }
+            }
+        } catch (ClassNotFoundException ex) {
+            java.util.logging.Logger.getLogger(Tablero1.class
+                    .getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        } catch (InstantiationException ex) {
+            java.util.logging.Logger.getLogger(Tablero1.class
+                    .getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        } catch (IllegalAccessException ex) {
+            java.util.logging.Logger.getLogger(Tablero1.class
+                    .getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        } catch (javax.swing.UnsupportedLookAndFeelException ex) {
+            java.util.logging.Logger.getLogger(Tablero1.class
+                    .getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        }
+        //</editor-fold>
+
+        /* Create and display the form */
+        java.awt.EventQueue.invokeLater(new Runnable() {
+            public void run() {
+                String jugador1 = JOptionPane.showInputDialog("Ingrese el nombre del Jugador 1:");
+                String jugador2 = JOptionPane.showInputDialog("Ingrese el nombre del Jugador 2:");
+                new Tablero1(jugador1, jugador2).setVisible(true);
+            }
+        });
+    }
+    private void mapButtonsToGrid(JButton[] botones) {
+        for (int i = 0; i < botones.length; i++) {
+            int fila = i / 10;
+            int col = i % 10;
+            matrizBotones[fila][col] = botones[i];
+        }
+    }
+
+    private void buttonActionPerformed(java.awt.event.ActionEvent evt) {
+
+        JButton boton = (JButton) evt.getSource();
+
+        limpiarResaltadoMovimientosValidos();
+
+        if (boton.getIcon() != null) {
+            String pieza = extraerNombreIcono(boton.getIcon().toString());
+            String tipo = esHeroe(pieza) ? "Heroe" : "Villano";
+            System.out.println("Pieza: " + pieza + " - Tipo: " + tipo);
+        }
+
+        if (botonSeleccionado == null) {
+            if (boton.getIcon() != null && esTurnoValido(boton)) {
+                botonSeleccionado = boton;
+                iconoSeleccionado = boton.getIcon();
+                boton.setBorder(bordeResaltado);
+                resaltarMovimientosValidos(boton);
+                resaltarCasillasDeAtaque(boton);
+                mostrarImagenGrande(iconoSeleccionado);
+            } else {
+                JOptionPane.showMessageDialog(this, "No es tu turno o no puedes mover esta ficha.");
+            }
+        } else {
+            if (boton == botonSeleccionado) {
+                botonSeleccionado.setBorder(bordePorDefecto);
+                botonSeleccionado = null;
+                iconoSeleccionado = null;
+            } else if (Movimientos.esMovimientoValido(matrizBotones, botonSeleccionado, boton)) {
+                Movimientos.moverFicha(matrizBotones, botonSeleccionado, boton);
+                if (verificarCondicionVictoria()) {
+                    declararGanador();
+                } else {
+                    cambiarTurno();
+                }
+            } else if (Ataques.atacar(matrizBotones, botonSeleccionado, boton, heroesVencidos, villanosVencidos)) {
+                // Mover la ficha atacante a la posición de la ficha atacada
+                boton.setIcon(botonSeleccionado.getIcon());
+                botonSeleccionado.setIcon(null); // Eliminar la ficha atacante de su posición original
+
+                if (jugadores.esTurnoJugador1()) {
+                    piezasPerdidasJugador2++;
+                } else {
+                    piezasPerdidasJugador1++;
+                }
+                if (verificarCondicionVictoria()) {
+                    declararGanador();
+                } else {
+                    cambiarTurno();
+                }
+            } else {
+                JOptionPane.showMessageDialog(this, "Movimiento no permitido");
+            }
+            if (botonSeleccionado != null) {
+                botonSeleccionado.setBorder(bordePorDefecto);
+                botonSeleccionado = null;
+                iconoSeleccionado = null;
+            }
+        }
+        System.out.println("Turno actual: " + (turnoActual == 1 ? "Jugador 1" : "Jugador 2"));
+
+    }
+
+    private boolean verificarCondicionVictoria() {
+        return verificarVictoriaPlanetEarth() || verificarVictoriaPorRango();
+
+    }
+
+    private void verificarCondicionVictoriaYSumarPuntos() {
+        if (verificarCondicionVictoria()) {
+            String ganador = determinarGanador();
+            loginUser.sumarPuntosAlJugador(ganador, 3);
+            declararGanador();
+        }
+    }
+
+    private boolean verificarVictoriaPlanetEarth() {
+        String bandoSeleccionado = loginUser.obtenerBandoSeleccionado();
+        if (bandoSeleccionado.equals("Heroes")) {
+            // Caso 1 y 2
+            return !existePlanetEarthVillains() || !existePlanetEarthHero();
+        } else {
+            // Caso 3 y 4
+            return !existePlanetEarthHero() || !existePlanetEarthVillains();
+        }
+    }
+
+    private boolean existePlanetEarthHero() {
+        for (int fila = 0; fila < matrizBotones.length; fila++) {
+            for (int col = 0; col < matrizBotones[fila].length; col++) {
+                JButton boton = matrizBotones[fila][col];
+                if (boton.getIcon() != null && boton.getIcon().toString().contains("PlanetEarthHeroes")) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    private boolean existePlanetEarthVillains() {
+        for (int fila = 0; fila < matrizBotones.length; fila++) {
+            for (int col = 0; col < matrizBotones[fila].length; col++) {
+                JButton boton = matrizBotones[fila][col];
+                if (boton.getIcon() != null && boton.getIcon().toString().contains("PlanetEarthVillains")) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    private boolean verificarVictoriaPorRango() {
+        String bandoSeleccionado = loginUser.obtenerBandoSeleccionado();
+        if (bandoSeleccionado.equals("Heroes")) {
+            // Caso 1 y 2
+            return !hayFichasDeRangoEnBandoOponente() || !hayFichasDeRangoEnBandoPropio();
+        } else {
+            // Caso 3 y 4
+            return !hayFichasDeRangoEnBandoOponente() || !hayFichasDeRangoEnBandoPropio();
+        }
+    }
+
+    private boolean hayFichasDeRangoEnBandoOponente() {
+        String[] fichasRangoOponente = jugadores.esTurnoJugador1() ? VILLANOS_RANGO : HEROES_RANGO;
+        for (int fila = 0; fila < matrizBotones.length; fila++) {
+            for (int col = 0; col < matrizBotones[fila].length; col++) {
+                JButton boton = matrizBotones[fila][col];
+                if (boton.getIcon() != null) {
+                    String iconoPath = boton.getIcon().toString();
+                    for (String fichaRango : fichasRangoOponente) {
+                        if (iconoPath.contains(fichaRango)) {
+                            return true;
+                        }
+                    }
+                }
+            }
+        }
+        return false;
+    }
+
+    private boolean hayFichasDeRangoEnBandoPropio() {
+        String[] fichasRangoPropio = jugadores.esTurnoJugador1() ? HEROES_RANGO : VILLANOS_RANGO;
+        for (int fila = 0; fila < matrizBotones.length; fila++) {
+            for (int col = 0; col < matrizBotones[fila].length; col++) {
+                JButton boton = matrizBotones[fila][col];
+                if (boton.getIcon() != null) {
+                    String iconoPath = boton.getIcon().toString();
+                    for (String fichaRango : fichasRangoPropio) {
+                        if (iconoPath.contains(fichaRango)) {
+                            return true;
+                        }
+                    }
+                }
+            }
+        }
+        return false;
+    }
+
+    private void declararGanador() {
+        String ganador = determinarGanador();
+        String bandoGanador = determinarBandoGanador();
+        String perdedor = (ganador.equals(jugador1)) ? jugador2 : jugador1;
+        String bandoPerdedor = (bandoGanador.equals("Heroes")) ? "Villanos" : "Heroes";
+        String mensaje = "";
+        String fecha = java.time.LocalDate.now().toString();
+
+        if (!hayFichasDeRangoEnBandoOponente() || !hayFichasDeRangoEnBandoPropio()) {
+            // Mensaje para cuando se gana por no tener fichas de rango
+            if (bandoGanador.equals("Heroes")) {
+                mensaje = String.format("Lo siento, %s usando %s ha perdido por no tener movimientos válidos disponibles ante %s – %s",
+                        perdedor, bandoPerdedor, ganador, fecha);
+            } else {
+                mensaje = String.format("Lo siento, %s usando %s ha perdido por no tener movimientos válidos disponibles ante %s – %s",
+                        perdedor, bandoPerdedor, ganador, fecha);
+            }
+        } else if (!existePlanetEarthHero() || !existePlanetEarthVillains()) {
+            // Mensaje para cuando se gana porque ficha tierra es atacada
+            if (bandoGanador.equals("Heroes")) {
+                mensaje = String.format("Felicidades %s usando los %s ha SALVADO la TIERRA! Venciendo a %s – %s",
+                        ganador, bandoGanador, perdedor, fecha);
+            } else {
+                mensaje = String.format("Felicidades %s usando los %s ha CAPTURADO la TIERRA! Venciendo a %s – %s",
+                        ganador, bandoGanador, perdedor, fecha);
+            }
+        }
+
+        JOptionPane.showMessageDialog(this, mensaje);
+        // Añadir 3 puntos al jugador ganador
+        loginUser.sumarPuntosAlJugador(ganador, 3);
+
+        // Registrar la partida jugada para ambos jugadores
+        loginUser.registrarPartidaJugado(ganador, bandoGanador, true, true, mensaje);  // true indica victoria y actualizar global
+        loginUser.registrarPartidaJugado(perdedor, bandoPerdedor, false, false, mensaje); // false indica derrota y no actualizar global
+        cerrarJuego();
+    }
+
+    private String determinarGanador() {
+        String bandoSeleccionado = loginUser.obtenerBandoSeleccionado();
+        if (bandoSeleccionado.equals("Heroes")) {
+            // Caso PlanetEarth 1 y 2
+            if (!existePlanetEarthVillains()) {
+                return jugador1;
+            } else if (!existePlanetEarthHero()) {
+                return jugador2;
+            }
+            // Caso Rango 1 y 2
+            if (!hayFichasDeRangoEnBandoOponente()) {
+                return jugador1;
+            } else if (!hayFichasDeRangoEnBandoPropio()) {
+                return jugador2;
+            }
+        } else {
+            // Caso PlanetEarth 3 y 4
+            if (!existePlanetEarthHero()) {
+                return jugador1;
+            } else if (!existePlanetEarthVillains()) {
+                return jugador2;
+            }
+            // Caso Rango 3 y 4
+            if (!hayFichasDeRangoEnBandoOponente()) {
+                return jugador2;
+            } else if (!hayFichasDeRangoEnBandoPropio()) {
+                return jugador1;
+            }
+        }
+        return jugadores.esTurnoJugador1() ? jugador2 : jugador1;
+    }
+
+    private String determinarBandoGanador() {
+        String bandoSeleccionado = loginUser.obtenerBandoSeleccionado();
+        if (bandoSeleccionado.equals("Heroes")) {
+            // Caso PlanetEarth 1 y 2
+            if (!existePlanetEarthVillains()) {
+                return "Heroes";
+            } else if (!existePlanetEarthHero()) {
+                return "Villanos";
+            }
+            // Caso Rango 1 y 2
+            if (!hayFichasDeRangoEnBandoOponente()) {
+                return "Heroes";
+            } else {
+                return "Villanos";
+            }
+        } else {
+            // Caso PlanetEarth 3 y 4
+            if (!existePlanetEarthHero()) {
+                return "Villanos";
+            } else if (!existePlanetEarthVillains()) {
+                return "Heroes";
+            }
+            // Caso Rango 3 y 4
+            if (!hayFichasDeRangoEnBandoOponente()) {
+                return "Heroes";
+            } else {
+                return "Villanos";
+            }
+        }
+    }
+
+    private void reiniciarPanelesFichasVencidas() {
+        // Reiniciar los índices de fichas vencidas
+        Ataques.reiniciarIndicesFichasVencidas();
+
+        // Limpiar iconos de botones de heroesVencidos y villanosVencidos
+        limpiarPanelFichasVencidas(heroesVencidos);
+        limpiarPanelFichasVencidas(villanosVencidos);
+    }
+
+    private void limpiarPanelFichasVencidas(JPanel panel) {
+        for (int i = 0; i < panel.getComponentCount(); i++) {
+            ((JButton) panel.getComponent(i)).setIcon(null);
+        }
+    }
+
+    private boolean oponenteSinMovimientosValidos() {
+        String[] fichasRango = jugadores.esTurnoJugador1() ? VILLANOS_RANGO : HEROES_RANGO;
+        for (int fila = 0; fila < matrizBotones.length; fila++) {
+            for (int col = 0; col < matrizBotones[fila].length; col++) {
+                JButton boton = matrizBotones[fila][col];
+                if (boton.getIcon() != null) {
+                    String iconoPath = boton.getIcon().toString();
+                    for (String fichaRango : fichasRango) {
+                        if (iconoPath.contains(fichaRango)) {
+                            return false;
+                        }
+                    }
+                }
+            }
+        }
+        return true;
+    }
+
+    private boolean esFichaDelOponente(Icon icono) {
+        String pieza = extraerNombreIcono(icono.toString());
+        boolean esHeroe = esHeroe(pieza);
+        String bandoSeleccionado = loginUser.obtenerBandoSeleccionado();
+        return (turnoActual == 1 && !esHeroe && bandoSeleccionado.equals("Villanos"))
+                || (turnoActual == 2 && esHeroe && bandoSeleccionado.equals("Heroes"));
+    }
+
+    private boolean esTurnoValido(JButton boton) {
+        String pieza = extraerNombreIcono(boton.getIcon().toString());
+        boolean esHeroe = esHeroe(pieza);
+        String bandoSeleccionado = loginUser.obtenerBandoSeleccionado();
+
+        if ((turnoActual == 1 && bandoSeleccionado.equals("Heroes") && esHeroe)
+                || (turnoActual == 2 && bandoSeleccionado.equals("Villanos") && esHeroe)
+                || (turnoActual == 1 && bandoSeleccionado.equals("Villanos") && !esHeroe)
+                || (turnoActual == 2 && bandoSeleccionado.equals("Heroes") && !esHeroe)) {
+            return true;
+        }
+        return false;
+    }
+
+    private void cambiarTurno() {
+        turnoActual = (turnoActual == 1) ? 2 : 1;
+    }
+
+    private boolean esHeroe(String pieza) {
+        String[] heroes = {
+            "BlackWidowHero", "CaptainAmerica", "DrStrange", "Elektra", "EmmaFrost", "Daredevil",
+            "Gambit", "Hulk", "HumanTorch", "IceMan", "InvisibleWoman", "IronMan", "NickFury",
+            "Wolverine", "Blade", "SpiderMan", "Thor", "ProfessorX", "Namor", "SilverSurfer",
+            "Cyclops", "GhostRider", "Punisher", "Thing", "SheHulk", "Beast", "GiantMan", "Colossus",
+            "SpiderGirl", "Storm", "Phoenix", "Nightcrawler", "NovaBlast", "PlanetEarthHeroes", "MrFantastic"
+        };
+        for (String heroe : heroes) {
+            if (heroe.equals(pieza)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private void mostrarImagenGrande(Icon icono) {
+        String nombreIcono = extraerNombreIcono(icono.toString());
+        String rutaImagenGrande = obtenerRutaImagenGrande(nombreIcono);
+        Icon iconoGrande = new ImageIcon(getClass().getResource(rutaImagenGrande));
+        fichaInfoLabel.setIcon(iconoGrande);
+    }
+
+    private String extraerNombreIcono(String rutaIcono) {
+        String[] partes = rutaIcono.split("/");
+        String nombreArchivo = partes[partes.length - 1];
+        return nombreArchivo.split("\\.")[0];
+
+    }
+
+    private String obtenerRutaImagenGrande(String nombreIcono) {
+        try {
+            // Asegúrate de que todas las imágenes grandes tienen el sufijo 'G' y están correctamente nombradas en la clase Ruta
+            java.lang.reflect.Field field = Ruta.class
+                    .getDeclaredField(nombreIcono + "G");
+            return (String) field.get(null);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return Ruta.MrFantasticG; // Devuelve una imagen por defecto si no se encuentra
+        }
+    }
+
+    private void limpiarResaltadoMovimientosValidos() {
+        for (int fila = 0; fila < matrizBotones.length; fila++) {
+            for (int col = 0; col < matrizBotones[fila].length; col++) {
+                JButton boton = matrizBotones[fila][col];
+                boton.setContentAreaFilled(false);
+                boton.setOpaque(false);
+                boton.setBorderPainted(true);
+                boton.setForeground(null);
+                boton.setUI(new javax.swing.plaf.basic.BasicButtonUI());
+                boton.repaint(); // Asegurarse de que se repinte correctamente
+
+            }
+        }
+    }
+
+    private void resaltarMovimientosValidos(JButton origen) {
+        for (int fila = 0; fila < matrizBotones.length; fila++) {
+            for (int col = 0; col < matrizBotones[fila].length; col++) {
+                JButton destino = matrizBotones[fila][col];
+                if (Movimientos.esMovimientoValido(matrizBotones, origen, destino)) {
+                    sombreadoCasillas(destino, new Color(255, 0, 0));
+                }
+            }
+        }
+    }
+
+    private void resaltarCasillasDeAtaque(JButton origen) {
+        for (int fila = 0; fila < matrizBotones.length; fila++) {
+            for (int col = 0; col < matrizBotones[fila].length; col++) {
+                JButton destino = matrizBotones[fila][col];
+                if (Ataques.esCasillaDeAtaqueValida(matrizBotones, origen, destino)) {
+                    sombreadoCasillas(destino, new Color(255, 0, 0, 100)); // Usar un color semitransparente
+                }
+            }
+        }
+    }
+
+    private void sombreadoCasillas(JButton button, Color color) {
+        button.setOpaque(false);
+        button.setContentAreaFilled(false);
+        button.setBorderPainted(false);
+        button.setForeground(color);
+
+        button.setUI(new javax.swing.plaf.basic.BasicButtonUI() {
+            @Override
+            public void paint(Graphics g, JComponent c) {
+                super.paint(g, c);
+                g.setColor(new Color(color.getRed(), color.getGreen(), color.getBlue(), 100));
+                g.fillRect(0, 0, c.getWidth(), c.getHeight());
+            }
+        });
+        button.repaint();
+
+    }
+
+    private void cerrarJuego() {
+        try {
+            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+        MenuPrincipal menu = new MenuPrincipal();
+        menu.setVisible(true);
+        this.dispose();
+
+    }
+
+    class FondoFramePanel extends JPanel {
+
+        private Image fondoFrame;
+
+        @Override
+        protected void paintComponent(Graphics g) {
+            super.paintComponent(g);
+            fondoFrame = new ImageIcon(getClass().getResource(JFRAMEFONDO)).getImage();
+            g.drawImage(fondoFrame, 0, 0, getWidth(), getHeight(), this);
+        }
+    }
+
+    class FondoPanel extends JPanel {
+
+        private Image fondo;
+
+        @Override
+        protected void paintComponent(Graphics g) {
+            super.paintComponent(g);
+            fondo = new ImageIcon(getClass().getResource(TABLEROFONDO)).getImage();
+            g.drawImage(fondo, 0, 0, getWidth(), getHeight(), this);
+            setOpaque(false);
+        }
+    }
+
+    // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JLabel Jugador1;
+    private javax.swing.JLabel Jugador2;
+    private javax.swing.JButton RetirarHeroesBtn;
+    private javax.swing.JButton RetirarVillanosBtn;
+    private javax.swing.JLabel fichaInfoLabel;
+    private javax.swing.JTextArea fichaInfoText;
+    private javax.swing.JPanel heroesVencidos;
+    private javax.swing.JButton jButton1;
+    private javax.swing.JButton jButton10;
+    private javax.swing.JButton jButton100;
+    private javax.swing.JButton jButton101;
+    private javax.swing.JButton jButton102;
+    private javax.swing.JButton jButton103;
+    private javax.swing.JButton jButton104;
+    private javax.swing.JButton jButton105;
+    private javax.swing.JButton jButton106;
+    private javax.swing.JButton jButton107;
+    private javax.swing.JButton jButton108;
+    private javax.swing.JButton jButton109;
+    private javax.swing.JButton jButton11;
+    private javax.swing.JButton jButton110;
+    private javax.swing.JButton jButton111;
+    private javax.swing.JButton jButton112;
+    private javax.swing.JButton jButton113;
+    private javax.swing.JButton jButton114;
+    private javax.swing.JButton jButton115;
+    private javax.swing.JButton jButton116;
+    private javax.swing.JButton jButton117;
+    private javax.swing.JButton jButton118;
+    private javax.swing.JButton jButton119;
+    private javax.swing.JButton jButton12;
+    private javax.swing.JButton jButton120;
+    private javax.swing.JButton jButton121;
+    private javax.swing.JButton jButton122;
+    private javax.swing.JButton jButton123;
+    private javax.swing.JButton jButton124;
+    private javax.swing.JButton jButton125;
+    private javax.swing.JButton jButton126;
+    private javax.swing.JButton jButton127;
+    private javax.swing.JButton jButton128;
+    private javax.swing.JButton jButton129;
+    private javax.swing.JButton jButton13;
+    private javax.swing.JButton jButton130;
+    private javax.swing.JButton jButton131;
+    private javax.swing.JButton jButton132;
+    private javax.swing.JButton jButton133;
+    private javax.swing.JButton jButton134;
+    private javax.swing.JButton jButton135;
+    private javax.swing.JButton jButton136;
+    private javax.swing.JButton jButton137;
+    private javax.swing.JButton jButton138;
+    private javax.swing.JButton jButton139;
+    private javax.swing.JButton jButton14;
+    private javax.swing.JButton jButton140;
+    private javax.swing.JButton jButton141;
+    private javax.swing.JButton jButton142;
+    private javax.swing.JButton jButton143;
+    private javax.swing.JButton jButton144;
+    private javax.swing.JButton jButton145;
+    private javax.swing.JButton jButton146;
+    private javax.swing.JButton jButton147;
+    private javax.swing.JButton jButton148;
+    private javax.swing.JButton jButton149;
+    private javax.swing.JButton jButton15;
+    private javax.swing.JButton jButton150;
+    private javax.swing.JButton jButton151;
+    private javax.swing.JButton jButton152;
+    private javax.swing.JButton jButton153;
+    private javax.swing.JButton jButton154;
+    private javax.swing.JButton jButton155;
+    private javax.swing.JButton jButton156;
+    private javax.swing.JButton jButton157;
+    private javax.swing.JButton jButton158;
+    private javax.swing.JButton jButton159;
+    private javax.swing.JButton jButton16;
+    private javax.swing.JButton jButton160;
+    private javax.swing.JButton jButton161;
+    private javax.swing.JButton jButton162;
+    private javax.swing.JButton jButton163;
+    private javax.swing.JButton jButton164;
+    private javax.swing.JButton jButton165;
+    private javax.swing.JButton jButton166;
+    private javax.swing.JButton jButton167;
+    private javax.swing.JButton jButton168;
+    private javax.swing.JButton jButton169;
+    private javax.swing.JButton jButton17;
+    private javax.swing.JButton jButton170;
+    private javax.swing.JButton jButton171;
+    private javax.swing.JButton jButton172;
+    private javax.swing.JButton jButton173;
+    private javax.swing.JButton jButton174;
+    private javax.swing.JButton jButton175;
+    private javax.swing.JButton jButton176;
+    private javax.swing.JButton jButton177;
+    private javax.swing.JButton jButton178;
+    private javax.swing.JButton jButton179;
+    private javax.swing.JButton jButton18;
+    private javax.swing.JButton jButton180;
+    private javax.swing.JButton jButton19;
+    private javax.swing.JButton jButton2;
+    private javax.swing.JButton jButton20;
+    private javax.swing.JButton jButton21;
+    private javax.swing.JButton jButton22;
+    private javax.swing.JButton jButton23;
+    private javax.swing.JButton jButton24;
+    private javax.swing.JButton jButton25;
+    private javax.swing.JButton jButton26;
+    private javax.swing.JButton jButton27;
+    private javax.swing.JButton jButton28;
+    private javax.swing.JButton jButton29;
+    private javax.swing.JButton jButton3;
+    private javax.swing.JButton jButton30;
+    private javax.swing.JButton jButton31;
+    private javax.swing.JButton jButton32;
+    private javax.swing.JButton jButton33;
+    private javax.swing.JButton jButton34;
+    private javax.swing.JButton jButton35;
+    private javax.swing.JButton jButton36;
+    private javax.swing.JButton jButton37;
+    private javax.swing.JButton jButton38;
+    private javax.swing.JButton jButton39;
+    private javax.swing.JButton jButton4;
+    private javax.swing.JButton jButton40;
+    private javax.swing.JButton jButton41;
+    private javax.swing.JButton jButton42;
+    private javax.swing.JButton jButton43;
+    private javax.swing.JButton jButton44;
+    private javax.swing.JButton jButton45;
+    private javax.swing.JButton jButton46;
+    private javax.swing.JButton jButton47;
+    private javax.swing.JButton jButton48;
+    private javax.swing.JButton jButton49;
+    private javax.swing.JButton jButton5;
+    private javax.swing.JButton jButton50;
+    private javax.swing.JButton jButton51;
+    private javax.swing.JButton jButton52;
+    private javax.swing.JButton jButton53;
+    private javax.swing.JButton jButton54;
+    private javax.swing.JButton jButton55;
+    private javax.swing.JButton jButton56;
+    private javax.swing.JButton jButton57;
+    private javax.swing.JButton jButton58;
+    private javax.swing.JButton jButton59;
+    private javax.swing.JButton jButton6;
+    private javax.swing.JButton jButton60;
+    private javax.swing.JButton jButton61;
+    private javax.swing.JButton jButton62;
+    private javax.swing.JButton jButton63;
+    private javax.swing.JButton jButton64;
+    private javax.swing.JButton jButton65;
+    private javax.swing.JButton jButton66;
+    private javax.swing.JButton jButton67;
+    private javax.swing.JButton jButton68;
+    private javax.swing.JButton jButton69;
+    private javax.swing.JButton jButton7;
+    private javax.swing.JButton jButton70;
+    private javax.swing.JButton jButton71;
+    private javax.swing.JButton jButton72;
+    private javax.swing.JButton jButton73;
+    private javax.swing.JButton jButton74;
+    private javax.swing.JButton jButton75;
+    private javax.swing.JButton jButton76;
+    private javax.swing.JButton jButton77;
+    private javax.swing.JButton jButton78;
+    private javax.swing.JButton jButton79;
+    private javax.swing.JButton jButton8;
+    private javax.swing.JButton jButton80;
+    private javax.swing.JButton jButton81;
+    private javax.swing.JButton jButton82;
+    private javax.swing.JButton jButton83;
+    private javax.swing.JButton jButton84;
+    private javax.swing.JButton jButton85;
+    private javax.swing.JButton jButton86;
+    private javax.swing.JButton jButton87;
+    private javax.swing.JButton jButton88;
+    private javax.swing.JButton jButton89;
+    private javax.swing.JButton jButton9;
+    private javax.swing.JButton jButton90;
+    private javax.swing.JButton jButton91;
+    private javax.swing.JButton jButton92;
+    private javax.swing.JButton jButton93;
+    private javax.swing.JButton jButton94;
+    private javax.swing.JButton jButton95;
+    private javax.swing.JButton jButton96;
+    private javax.swing.JButton jButton97;
+    private javax.swing.JButton jButton98;
+    private javax.swing.JButton jButton99;
+    private javax.swing.JPanel jPanel2;
+    private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JPanel villanosVencidos;
+    // End of variables declaration//GEN-END:variables
+
+}
